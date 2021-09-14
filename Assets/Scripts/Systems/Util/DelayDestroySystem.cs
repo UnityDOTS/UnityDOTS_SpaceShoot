@@ -3,7 +3,7 @@ using Unity.Entities;
 namespace DOTS
 {
     /// <summary>
-    /// 逻辑层 延迟自我销毁
+    /// 延迟销毁
     /// </summary>
     public class DelayDestroySystem : SystemBase
     {

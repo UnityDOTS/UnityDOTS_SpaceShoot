@@ -29,7 +29,7 @@ namespace DOTS
             if (_timePassed >= _timeToCreateAsteroid)
             {
                 _timePassed = 0.0f;
-                CreateAsteroid((uint)UnityEngine.Random.Range(1, 100000));
+                CreateAsteroid((uint) UnityEngine.Random.Range(1, 100000));
 
                 // Reduce the creation time during the game
                 if (_timeToCreateAsteroid > 1f)
@@ -63,7 +63,7 @@ namespace DOTS
                     }
 
                     var instance = commandBuffer.Instantiate(entityInQueryIndex, spawnedAsteroid);
-                    commandBuffer.SetComponent(entityInQueryIndex, instance, new Translation { Value = math.transform(location.Value, new float3(random.NextFloat(-5f, 5f), 0, 15f)) });
+                    commandBuffer.SetComponent(entityInQueryIndex, instance, new Translation { Value = math.transform(location.Value, new float3(random.NextFloat(GameManager.Instance.SpaceBottomLeft.x, GameManager.Instance.SpaceTopRight.x), 0, GameManager.Instance.BoundaryTopRight.z)) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new MovementComponent() { Speed = 5f, Direction = new float3(0, 0, -1) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new RotationComponent() { AngularVelocity = new float3(0.0f, 0.0f, random.NextFloat(-1.0f, 1.0f)) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new AsteroidComponent() { DestructionParticle = asteroidManagerComponent.DestructionParticle });

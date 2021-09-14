@@ -10,30 +10,55 @@ using Entity = Unity.Entities.Entity;
 
 namespace DOTS
 {
-    public class GameManager : Singleton<GameManager>
+    public class GameManager : MonoBehaviour
     {
+        public static GameManager Instance;
+
+        public Camera CacheMainCamera;
         public Text Scroe;
         public Text Life;
         [SerializeField] private GameObject m_RestartTap;
+        [SerializeField] private float m_GameRestartIntervalTime = 5f;
 
-        [Tooltip("自动重新开始的间隔时间")] [SerializeField]
-        private float m_GameRestartIntervalTime = 5f;
-
-        private float _restartPauseTime;
-
+        public Vector3 SpaceBottomLeft { get; private set; }
+        public Vector3 SpaceTopRight { get; private set; }
+        public Vector3 BoundaryBottomLeft { get; private set; }
+        public Vector3 BoundaryTopRight { get; private set; }
         public bool IsPlaying { get; private set; }
-
+        private float _restartPauseTime;
         private BuildPhysicsWorld _buildPhysicsWorld;
 
-
-        public override void Awake()
+        public void Awake()
         {
-            base.Awake();
-            _restartPauseTime = m_GameRestartIntervalTime;
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
 
+            CacheMainCamera = Camera.main;
+
+            Instance = this;
             IsPlaying = true;
+            _restartPauseTime = m_GameRestartIntervalTime;
             m_RestartTap.gameObject.SetActive(false);
             _buildPhysicsWorld = World.DefaultGameObjectInjectionWorld.GetExistingSystem<BuildPhysicsWorld>();
+            CalculateScreenBounds();
+        }
+
+        /// <summary>
+        /// 计算屏幕区域边界
+        /// </summary>
+        private void CalculateScreenBounds()
+        {
+            var bottomLeft = CacheMainCamera.ViewportToWorldPoint(new Vector3(0, 0, CacheMainCamera.nearClipPlane)); // -5.6, -5   左下角
+            var topRight = CacheMainCamera.ViewportToWorldPoint(new Vector3(1, 1, CacheMainCamera.nearClipPlane)); // 5.6, 15   右上角
+            var half = Vector3.one / 2.0f;
+
+            SpaceBottomLeft = bottomLeft + half;
+            SpaceTopRight = topRight - half;
+            BoundaryBottomLeft = bottomLeft - Vector3.one;
+            BoundaryTopRight = topRight + Vector3.one;
         }
 
         private void Update()

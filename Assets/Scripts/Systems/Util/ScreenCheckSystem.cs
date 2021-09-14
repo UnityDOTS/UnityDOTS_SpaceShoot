@@ -12,28 +12,25 @@ namespace DOTS
         {
             Entities.ForEach((Entity e, in Translation translation, in BulletComponent bulletComponent) =>
             {
-                if (translation.Value.z < -4f || translation.Value.z > 14f)
+                if (translation.Value.z < GameManager.Instance.BoundaryBottomLeft.z || translation.Value.z > GameManager.Instance.BoundaryTopRight.z)
                 {
                     EntityManager.DestroyEntity(e);
-                    // EntityManager.AddComponentData(e, new DestroyComponent());
                 }
             }).WithStructuralChanges().Run();
 
             Entities.ForEach((Entity e, in Translation translation, in AsteroidComponent asteroidComponent) =>
             {
-                if (translation.Value.z < -6f)
+                if (translation.Value.z < GameManager.Instance.BoundaryBottomLeft.z)
                 {
                     EntityManager.DestroyEntity(e);
-                    // EntityManager.AddComponentData(e, new DestroyComponent());
                 }
             }).WithStructuralChanges().Run();
 
             Entities.ForEach((Entity e, in Translation translation, in EnemyComponent enemyComponent) =>
             {
-                if (translation.Value.z < -6f)
+                if (translation.Value.z < GameManager.Instance.BoundaryBottomLeft.z)
                 {
                     EntityManager.DestroyEntity(e);
-                    // EntityManager.AddComponentData(e, new DestroyComponent());
                 }
             }).WithStructuralChanges().Run();
         }

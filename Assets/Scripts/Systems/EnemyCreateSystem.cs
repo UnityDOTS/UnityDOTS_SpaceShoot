@@ -29,7 +29,7 @@ namespace DOTS
             if (_timePassed >= _timeToCreateEnemy)
             {
                 _timePassed = 0.0f;
-                CreateEnemy((uint)UnityEngine.Random.Range(1, 100000));
+                CreateEnemy((uint) UnityEngine.Random.Range(1, 100000));
 
                 // Reduce the creation time during the game
                 if (_timeToCreateEnemy > 2f)
@@ -49,7 +49,7 @@ namespace DOTS
                     var random = new Random(seek);
                     var instance = commandBuffer.Instantiate(entityInQueryIndex, enemyManagerComponent.EnmeyPrefab_01);
 
-                    commandBuffer.SetComponent(entityInQueryIndex, instance, new Translation() { Value = math.transform(location.Value, new float3(random.NextFloat(-5f, 5f), 0, 15f)) });
+                    commandBuffer.SetComponent(entityInQueryIndex, instance, new Translation() { Value = math.transform(location.Value, new float3(random.NextFloat(GameManager.Instance.SpaceBottomLeft.x, GameManager.Instance.SpaceTopRight.x), 0, GameManager.Instance.BoundaryTopRight.z)) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new MovementComponent() { Speed = 5.0f, Direction = new float3(0, 0, -1) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new EnemyComponent() { ChangeDestinationCountdown = random.NextFloat(0, 0.5f), DestructionParticle = enemyManagerComponent.DestructionParticle });
                 }).ScheduleParallel();
