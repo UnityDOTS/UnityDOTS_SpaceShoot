@@ -11,18 +11,20 @@ namespace DOTS
     /// <summary>
     /// 触发事件System（在EndFramePhysicsSystem之后执行）
     /// </summary>
-    [UpdateAfter(typeof(ShooterSystem))]
+    [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
+    [UpdateAfter(typeof(StepPhysicsWorld))]
     [UpdateAfter(typeof(EndFramePhysicsSystem))]
-    public class TriggerEventSystem : JobComponentSystem
+    public class TriggerEventSystem : SystemBase
     {
         private BuildPhysicsWorld buildPhysicsWorlds;
         private StepPhysicsWorld stepPhysicsWorlds;
+        private EntityCommandBufferSystem entityCommandBufferSystem;
 
         protected override void OnCreate()
         {
-            base.OnCreate();
             buildPhysicsWorlds = World.GetOrCreateSystem<BuildPhysicsWorld>();
             stepPhysicsWorlds = World.GetOrCreateSystem<StepPhysicsWorld>();
+            entityCommandBufferSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
         }
 
         [BurstCompile]
@@ -50,7 +52,7 @@ namespace DOTS
 
             public void CreatePlayerParticle(Entity playerEntity)
             {
-                Entity particleEntity = entityCommandBuffer.Instantiate(playerComponent.DestructionParticle);
+                Entity particleEntity = entityCommandBuffer.Instantiate(players[playerEntity].DestructionParticle);
 
                 Translation particleTranslation = new Translation { Value = translations[playerEntity].Value };
 
@@ -202,8 +204,8 @@ namespace DOTS
 
             public void Execute(TriggerEvent triggerEvent)
             {
-                Entity obj1 = triggerEvent.EntityA;
-                Entity obj2 = triggerEvent.EntityB;
+                var obj1 = triggerEvent.EntityA;
+                var obj2 = triggerEvent.EntityB;
 
                 CheckBulletAsteroidCollision(obj1, obj2);
                 CheckAsteroidPlayerCollision(obj1, obj2);
@@ -213,27 +215,23 @@ namespace DOTS
             }
         }
 
-        protected override JobHandle OnUpdate(JobHandle inputDeps)
+        protected override void OnUpdate()
         {
-            ObjectsTriggerSystemJob job = new ObjectsTriggerSystemJob();
-            job.players = GetComponentDataFromEntity<PlayerComponent>();
-            job.enemys = GetComponentDataFromEntity<EnemyComponent>();
-            job.asteroids = GetComponentDataFromEntity<AsteroidComponent>();
-            job.bullets = GetComponentDataFromEntity<BulletComponent>();
-            job.translations = GetComponentDataFromEntity<Translation>();
+            var commandBuffer = entityCommandBufferSystem.CreateCommandBuffer();
+            var players = GetComponentDataFromEntity<PlayerComponent>();
+            var playerEntity = GetSingletonEntity<PlayerComponent>();
 
-            BeginInitializationEntityCommandBufferSystem ecbSystem;
-
-            ecbSystem = World.GetExistingSystem<BeginInitializationEntityCommandBufferSystem>();
-            job.playerEntity = ecbSystem.GetSingletonEntity<PlayerComponent>();
-            job.playerComponent = job.players[job.playerEntity];
-            job.entityCommandBuffer = ecbSystem.CreateCommandBuffer();
-
-            JobHandle jobHandle = job.Schedule(stepPhysicsWorlds.Simulation, ref buildPhysicsWorlds.PhysicsWorld, inputDeps);
-
-            ecbSystem.AddJobHandleForProducer(jobHandle);
-
-            return jobHandle;
+            Dependency = new ObjectsTriggerSystemJob
+            {
+                players = players,
+                enemys = GetComponentDataFromEntity<EnemyComponent>(),
+                asteroids = GetComponentDataFromEntity<AsteroidComponent>(),
+                bullets = GetComponentDataFromEntity<BulletComponent>(),
+                translations = GetComponentDataFromEntity<Translation>(),
+                playerEntity = playerEntity,
+                playerComponent = players[playerEntity],
+                entityCommandBuffer = commandBuffer,
+            }.Schedule(stepPhysicsWorlds.Simulation, ref buildPhysicsWorlds.PhysicsWorld, Dependency);
         }
     }
 }
