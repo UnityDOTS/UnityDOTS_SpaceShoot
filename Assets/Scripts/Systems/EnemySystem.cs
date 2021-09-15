@@ -19,7 +19,8 @@ namespace DOTS
 
         protected override void OnUpdate()
         {
-            var seek = (uint)UnityEngine.Random.Range(1, 100000);
+            var seek = (uint) UnityEngine.Random.Range(1, 100000);
+            var random = new Random(seek);
             var deltaTime = Time.DeltaTime;
 
             Entities
@@ -27,7 +28,6 @@ namespace DOTS
                 .WithBurst(FloatMode.Default, FloatPrecision.Standard, true)
                 .ForEach((Entity entity, ref EnemyComponent enemyComponent, ref MovementComponent movementComponent) =>
                 {
-                    var random = new Random(seek);
                     enemyComponent.ChangeDestinationCountdown -= deltaTime;
                     if (enemyComponent.ChangeDestinationCountdown <= 0f)
                     {

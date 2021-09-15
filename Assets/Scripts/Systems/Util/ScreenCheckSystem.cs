@@ -10,29 +10,35 @@ namespace DOTS
     {
         protected override void OnUpdate()
         {
-            Entities.ForEach((Entity e, in Translation translation, in BulletComponent bulletComponent) =>
-            {
-                if (translation.Value.z < GameManager.Instance.BoundaryBottomLeft.z || translation.Value.z > GameManager.Instance.BoundaryTopRight.z)
+            Entities
+                .WithStructuralChanges()
+                .ForEach((Entity e, in Translation translation, in BulletComponent bulletComponent) =>
                 {
-                    EntityManager.DestroyEntity(e);
-                }
-            }).WithStructuralChanges().Run();
+                    if (translation.Value.z < GameManager.BoundaryBottomLeft.z || translation.Value.z > GameManager.BoundaryTopRight.z)
+                    {
+                        EntityManager.DestroyEntity(e);
+                    }
+                }).Run();
 
-            Entities.ForEach((Entity e, in Translation translation, in AsteroidComponent asteroidComponent) =>
-            {
-                if (translation.Value.z < GameManager.Instance.BoundaryBottomLeft.z)
+            Entities
+                .WithStructuralChanges()
+                .ForEach((Entity e, in Translation translation, in AsteroidComponent asteroidComponent) =>
                 {
-                    EntityManager.DestroyEntity(e);
-                }
-            }).WithStructuralChanges().Run();
+                    if (translation.Value.z < GameManager.BoundaryBottomLeft.z)
+                    {
+                        EntityManager.DestroyEntity(e);
+                    }
+                }).Run();
 
-            Entities.ForEach((Entity e, in Translation translation, in EnemyComponent enemyComponent) =>
-            {
-                if (translation.Value.z < GameManager.Instance.BoundaryBottomLeft.z)
+            Entities
+                .WithStructuralChanges()
+                .ForEach((Entity e, in Translation translation, in EnemyComponent enemyComponent) =>
                 {
-                    EntityManager.DestroyEntity(e);
-                }
-            }).WithStructuralChanges().Run();
+                    if (translation.Value.z < GameManager.BoundaryBottomLeft.z)
+                    {
+                        EntityManager.DestroyEntity(e);
+                    }
+                }).Run();
         }
     }
 }

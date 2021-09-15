@@ -23,7 +23,7 @@ namespace DOTS
 
         protected override void OnUpdate()
         {
-            if (!GameManager.Instance.IsPlaying) return;
+            if (!GameManager.IsPlaying()) return;
 
             _timePassed += Time.DeltaTime;
             if (_timePassed >= _timeToCreateAsteroid)
@@ -40,13 +40,14 @@ namespace DOTS
         private void CreateAsteroid(uint seek)
         {
             var commandBuffer = _entityCommandBufferSystem.CreateCommandBuffer().AsParallelWriter();
+            var random = new Random(seek);
+            var position = new float3(random.NextFloat(GameManager.SpaceBottomLeft.x, GameManager.SpaceTopRight.x), 0, GameManager.BoundaryTopRight.z);
 
             Entities
                 .WithName("AsteroidCreateSystem")
                 .WithBurst(FloatMode.Default, FloatPrecision.Standard, true)
                 .ForEach((int entityInQueryIndex, in AsteroidManagerComponent asteroidManagerComponent, in LocalToWorld location) =>
                 {
-                    var random = new Random(seek);
                     Entity spawnedAsteroid = Entity.Null;
                     int value = random.NextInt(1, 4);
                     switch (value)
@@ -63,7 +64,7 @@ namespace DOTS
                     }
 
                     var instance = commandBuffer.Instantiate(entityInQueryIndex, spawnedAsteroid);
-                    commandBuffer.SetComponent(entityInQueryIndex, instance, new Translation { Value = math.transform(location.Value, new float3(random.NextFloat(GameManager.Instance.SpaceBottomLeft.x, GameManager.Instance.SpaceTopRight.x), 0, GameManager.Instance.BoundaryTopRight.z)) });
+                    commandBuffer.SetComponent(entityInQueryIndex, instance, new Translation { Value = math.transform(location.Value, position) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new MovementComponent() { Speed = 5f, Direction = new float3(0, 0, -1) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new RotationComponent() { AngularVelocity = new float3(0.0f, 0.0f, random.NextFloat(-1.0f, 1.0f)) });
                     commandBuffer.SetComponent(entityInQueryIndex, instance, new AsteroidComponent() { DestructionParticle = asteroidManagerComponent.DestructionParticle });

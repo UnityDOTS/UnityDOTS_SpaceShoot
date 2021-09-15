@@ -18,9 +18,9 @@ namespace DOTS
             if (Input.GetMouseButton(0))
             {
                 var mousePosition = (float3) Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                mousePosition.x = math.clamp(mousePosition.x, GameManager.Instance.SpaceBottomLeft.x, GameManager.Instance.SpaceTopRight.x);
+                mousePosition.x = math.clamp(mousePosition.x, GameManager.SpaceBottomLeft.x, GameManager.SpaceTopRight.x);
                 mousePosition.y = 0f;
-                mousePosition.z = math.clamp(mousePosition.z, GameManager.Instance.SpaceBottomLeft.z, GameManager.Instance.SpaceTopRight.z);
+                mousePosition.z = math.clamp(mousePosition.z, GameManager.SpaceBottomLeft.z, GameManager.SpaceTopRight.z);
                 playerComponent.Destination = mousePosition;
                 EntityManager.SetComponentData(playerEntity, playerComponent);
             }

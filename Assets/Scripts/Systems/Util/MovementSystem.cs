@@ -8,11 +8,13 @@ namespace DOTS
     {
         protected override void OnUpdate()
         {
+            var spaceBottomLeft = GameManager.SpaceBottomLeft;
+            var spaceTopRight = GameManager.SpaceTopRight;
             var deltaTime = Time.DeltaTime;
             Entities.WithAll<MovementComponent>().ForEach((ref Translation translation, in MovementComponent movementComponent) =>
             {
                 translation.Value += movementComponent.Direction * movementComponent.Speed * deltaTime;
-                translation.Value.x = math.clamp(translation.Value.x, GameManager.Instance.SpaceBottomLeft.x, GameManager.Instance.SpaceTopRight.x);
+                translation.Value.x = math.clamp(translation.Value.x, spaceBottomLeft.x, spaceTopRight.x);
             }).Run();
         }
     }

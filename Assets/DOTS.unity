@@ -5929,8 +5929,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9418fff8c4ee3604bac54176c6be08e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Scroe: {fileID: 1712407739}
-  Life: {fileID: 149158266}
+  m_CacheMainCamera: {fileID: 1461320658}
+  m_Score: {fileID: 1712407739}
+  m_Life: {fileID: 149158266}
   m_RestartTap: {fileID: 962281690}
   m_GameRestartIntervalTime: 5
 --- !u!4 &681938527

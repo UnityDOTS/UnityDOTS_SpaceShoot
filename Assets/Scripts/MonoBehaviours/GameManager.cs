@@ -12,34 +12,44 @@ namespace DOTS
 {
     public class GameManager : MonoBehaviour
     {
-        public static GameManager Instance;
+        static GameManager instance;
 
-        public Camera CacheMainCamera;
-        public Text Scroe;
-        public Text Life;
+        [SerializeField] private Camera m_CacheMainCamera;
+        [SerializeField] private Text m_Score;
+        [SerializeField] private Text m_Life;
         [SerializeField] private GameObject m_RestartTap;
         [SerializeField] private float m_GameRestartIntervalTime = 5f;
 
-        public Vector3 SpaceBottomLeft { get; private set; }
-        public Vector3 SpaceTopRight { get; private set; }
-        public Vector3 BoundaryBottomLeft { get; private set; }
-        public Vector3 BoundaryTopRight { get; private set; }
-        public bool IsPlaying { get; private set; }
+        private Vector3 _spaceBottomLeft;
+        private Vector3 _spaceTopRight;
+        private Vector3 _boundaryBottomLeft;
+        private Vector3 _boundaryTopRight;
+        private bool _isPlaying;
+
         private float _restartPauseTime;
         private BuildPhysicsWorld _buildPhysicsWorld;
 
+        public static Vector3 SpaceBottomLeft => instance._spaceBottomLeft;
+        public static Vector3 SpaceTopRight => instance._spaceTopRight;
+        public static Vector3 BoundaryBottomLeft => instance._boundaryBottomLeft;
+        public static Vector3 BoundaryTopRight => instance._boundaryTopRight;
+        public static bool IsPlaying() => instance._isPlaying;
+
         public void Awake()
         {
-            if (Instance != null && Instance != this)
+            if (instance != null && instance != this)
             {
                 Destroy(gameObject);
-                return;
+            }
+            else
+            {
+                instance = this;
             }
 
-            CacheMainCamera = Camera.main;
+            m_CacheMainCamera = Camera.main;
 
-            Instance = this;
-            IsPlaying = true;
+            instance = this;
+            _isPlaying = true;
             _restartPauseTime = m_GameRestartIntervalTime;
             m_RestartTap.gameObject.SetActive(false);
             _buildPhysicsWorld = World.DefaultGameObjectInjectionWorld.GetExistingSystem<BuildPhysicsWorld>();
@@ -51,14 +61,14 @@ namespace DOTS
         /// </summary>
         private void CalculateScreenBounds()
         {
-            var bottomLeft = CacheMainCamera.ViewportToWorldPoint(new Vector3(0, 0, CacheMainCamera.nearClipPlane)); // -5.6, -5   左下角
-            var topRight = CacheMainCamera.ViewportToWorldPoint(new Vector3(1, 1, CacheMainCamera.nearClipPlane)); // 5.6, 15   右上角
+            var bottomLeft = m_CacheMainCamera.ViewportToWorldPoint(new Vector3(0, 0, m_CacheMainCamera.nearClipPlane)); // -5.6, -5   左下角
+            var topRight = m_CacheMainCamera.ViewportToWorldPoint(new Vector3(1, 1, m_CacheMainCamera.nearClipPlane)); // 5.6, 15   右上角
             var half = Vector3.one / 2.0f;
 
-            SpaceBottomLeft = bottomLeft + half;
-            SpaceTopRight = topRight - half;
-            BoundaryBottomLeft = bottomLeft - Vector3.one;
-            BoundaryTopRight = topRight + Vector3.one;
+            _spaceBottomLeft = bottomLeft + half;
+            _spaceTopRight = topRight - half;
+            _boundaryBottomLeft = bottomLeft - Vector3.one;
+            _boundaryTopRight = topRight + Vector3.one;
         }
 
         private void Update()
@@ -74,9 +84,9 @@ namespace DOTS
                 if (playerComponent.Life == 0)
                 {
                     _restartPauseTime -= Time.deltaTime;
-                    if (IsPlaying)
+                    if (_isPlaying)
                     {
-                        IsPlaying = false;
+                        _isPlaying = false;
                         StartCoroutine(nameof(RestartTapCoroutine));
                     }
 
@@ -104,7 +114,7 @@ namespace DOTS
 
         private void RestartLevel(Entity player)
         {
-            IsPlaying = true;
+            _isPlaying = true;
             m_RestartTap.gameObject.SetActive(false);
 
             var entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
@@ -142,8 +152,8 @@ namespace DOTS
 
         private void UpdateInterface(Entity player, PlayerComponent playerComponent)
         {
-            Life.text = playerComponent.Life.ToString();
-            Scroe.text = playerComponent.Score.ToString();
+            m_Life.text = playerComponent.Life.ToString();
+            m_Score.text = playerComponent.Score.ToString();
         }
     }
 }

@@ -17,7 +17,7 @@ namespace DOTS
 
         protected override void OnUpdate()
         {
-            if (!GameManager.Instance.IsPlaying)
+            if (!GameManager.IsPlaying())
             {
                 return;
             }
