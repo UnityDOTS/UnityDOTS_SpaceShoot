@@ -1,7 +1,13 @@
+<div align="right">
+  Language:
+  🇺🇸
+  <a title="Chinese" href="README-CN.md">🇨🇳</a>
+</div>
+
 # UnityDOTS SpaceShoot
 
-这是一个Unity Dots相关的游戏Demo，旨在练习如何将一个基于MonoBehavior的游戏，转换为DOTS为基础的Demo。
+This is a Unity Dots-related game Demo designed to practice how to convert a MonobeHavior-based DTS-based demo.
 
-游戏操作很简单，点击屏幕控制飞船的位置，并开始射击。
+The game operation is very simple, click on the screen to control the location of the spacecraft, and start shooting.
 
-尽情享受吧！
+Enjoy it!
